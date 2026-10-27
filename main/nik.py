@@ -1,14 +1,28 @@
-def validate_nik(nik):
-    nik=nik.strip()
-    if not nik.isdigit(): return False,"Harus angka"
-    if len(nik)!=16: return False,f"Harus 16 digit"
-    day=int(nik[6:8]); month=int(nik[8:10])
-    real=day-40 if day>40 else day
-    if not 1<=real<=31: return False,"Tgl salah"
-    if not 1<=month<=12: return False,"Bln salah"
-    return True,"Valid"
-def parse_nik(nik):
-    day=int(nik[6:8])
-    return {"kode_wilayah":nik[0:6],"tgl":day-40 if day>40 else day,"bulan":nik[8:10],"tahun":nik[10:12],"gender":"Perempuan" if day>40 else "Laki-laki"}
-def estimate_birth_year(two):
-    y=int(two); return 1900+y if y>30 else 2000+y
+import getpass
+from validator.nik_validator import validate_nik, parse_nik, estimate_birth_year
+from datetime import datetime
+
+def check_nik():
+    try:
+        nik = getpass.getpass("\nMasukkan NIK 16 digit (hidden): ").strip()
+    except:
+        nik = input("\nMasukkan NIK 16 digit: ").strip()
+    
+    print("[*] NIK disembunyikan untuk privasi")
+    valid, msg = validate_nik(nik)
+    if not valid:
+        print(f"[GAGAL] {msg}")
+        return
+    
+    data = parse_nik(nik)
+    tahun = estimate_birth_year(data['tahun'])
+    umur = datetime.now().year - tahun
+    
+    print("\n========== HASIL CEK NIK ==========")
+    print(f"Kode Wilayah : {data['kode_wilayah']}")
+    print(f"Tgl Lahir    : {data['tgl']}-{data['bulan']}-{tahun}")
+    print(f"Gender       : {data['gender']}")
+    print(f"Umur         : {umur} tahun")
+    print(f"Status       : {msg}")
+    print("===================================\n")
+

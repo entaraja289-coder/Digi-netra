@@ -1,9 +1,18 @@
-import re
-EMAIL_REGEX = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-def validate_email(email):
-    email=email.strip().lower()
-    if not re.match(EMAIL_REGEX, email): return False,"Format salah"
-    return True,"Valid"
-def parse_email(email):
-    local,domain=email.strip().lower().split("@",1)
-    return {"email":email,"username":local,"domain":domain,"provider":"Gmail" if "gmail" in domain else "Custom"}
+import getpass
+from validator.email_validator import validate_email, parse_email
+
+def check_email():
+    try:
+        email = getpass.getpass("\nMasukkan Email (hidden): ").strip()
+    except:
+        email = input("\nMasukkan Email: ").strip()
+    
+    valid, msg = validate_email(email)
+    if not valid:
+        print(f"[GAGAL] {msg}")
+        return
+    
+    data = parse_email(email)
+    print(f"\nEmail: {data['email']}")
+    print(f"Provider: {data['provider']}")
+    print(f"Status: {msg}\n")
